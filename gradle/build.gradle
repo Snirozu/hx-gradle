@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'application'
+    id "com.github.johnrengelman.shadow" version "8.1.1" // adds dependencies to jar
+}
+
+group = 'yourgrouphere'
+version = '1.0'
+
+sourceSets.main.java.srcDirs = ['src'] // don't remove that!
+mainClassName = "%HXGRADLE_CLASS_PATH%"
+
+jar {
+  manifest {
+    attributes(
+      "Main-Class": mainClassName
+    )
+  }
+}
+
+// optionally support UTF-8
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+repositories {
+
+}
+
+dependencies {
+
+}

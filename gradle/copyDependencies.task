@@ -1,0 +1,10 @@
+//used by hxgradle update
+task copyDependencies(type: Copy) {
+  configurations.implementation.canBeResolved = true
+  from configurations.implementation
+  into '../dependencies'
+
+  configurations.compileOnly.canBeResolved = true
+  from configurations.compileOnly
+  into '../dependencies'
+}
