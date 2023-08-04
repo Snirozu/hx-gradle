@@ -20,8 +20,9 @@ function main() {
 	if (args.length <= 0 || args[0] == "help") {
 		echo("======= HaxeGradle =======", ANSI_GREEN);
 		echo("> hxgradle readme - Please read this before using build command.");
-		echo("> hxgradle build - Build the project.");
-		echo("> hxgradle update - Installs dependencies into 'dependencies' directory so you can use it with Haxe.");
+		echo("> hxgradle build - Build the project using build.hxml file.");
+		echo("> hxgradle update - Installs dependencies into 'dependencies' directory so you can use it with Haxe. " + 
+				"Remember to add '--java-lib dependencies' to your build.hxml file after it finishes!");
         return;
 	}
 
@@ -58,13 +59,17 @@ function main() {
 			}
 			
 			echo("Cleaning...");
-			final mainClass = File.getContent(gradleProjectPath + "/manifest").split("\n")[0].split("Main-Class: ")[1].trim();
-			final mainClassName = mainClass.split(".").pop().trim();
-			final cleanList = ["obj/", "cmd", "hxjava_build.txt", "manifest"];
-			for (file in cleanList) {
-				removeFile(Path.join([gradleProjectPath + "/", file]));
+			var jarName = gradleProjectPath;
+			var classPath = gradleProjectPath;
+			if (FileSystem.exists(gradleProjectPath + "/manifest")) {
+				classPath = File.getContent(gradleProjectPath + "/manifest").split("\n")[0].split("Main-Class: ")[1].trim();
+				jarName = classPath.split(".").pop().trim();
+				final cleanList = ["obj/", "cmd", "hxjava_build.txt", "manifest"];
+				for (file in cleanList) {
+					removeFile(Path.join([gradleProjectPath + "/", file]));
+				}
 			}
-			removeFile(gradleProjectPath + "/" + mainClassName + ".jar");
+			removeFile(gradleProjectPath + "/" + jarName + ".jar");
 
 			if (!FileSystem.exists(gradleProjectPath + "/gradle/wrapper/gradle-wrapper.jar")) {
 				echo("Copying Gradle Wrapper JAR...");
@@ -80,7 +85,7 @@ function main() {
 				echo("Generating empty build.gradle file...");
 				//File.copy(Path.join([libPath, "gradle/build.gradle"]), "build/build.gradle");
 				var daGradleConfig = File.getContent(Path.join([libPath, "gradle/build.gradle"]));
-				daGradleConfig = daGradleConfig.replace("%HXGRADLE_CLASS_PATH%", mainClass);
+				daGradleConfig = daGradleConfig.replace("%HXGRADLE_CLASS_PATH%", classPath);
 				File.saveContent(gradleProjectPath + "/build.gradle", daGradleConfig);
 			}
 
